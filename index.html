@@ -21,7 +21,7 @@
       width: 100%;
       border-collapse: collapse;
       margin-top: 15px;
-      min-width: 800px;
+      min-width: 1000px;
     }
     table, th, td {
       border: 1px solid #ccc;
@@ -55,10 +55,11 @@
     <table>
       <thead>
         <tr>
+          <th>Cantidad</th>
           <th>Material</th>
           <th>Largo (m)</th>
           <th>Alto (m)</th>
-          <th>m²</th>
+          <th>Total m²</th>
           <th>Precio m²</th>
           <th>Total</th>
           <th>🗑</th>
@@ -94,6 +95,15 @@
       const tabla = document.getElementById('tabla');
       const fila = document.createElement('tr');
 
+      // Cantidad
+      const tdCantidad = document.createElement('td');
+      const inputCantidad = document.createElement('input');
+      inputCantidad.type = 'number';
+      inputCantidad.min = '1';
+      inputCantidad.value = '1';
+      tdCantidad.appendChild(inputCantidad);
+
+      // Material
       const tdMaterial = document.createElement('td');
       const select = document.createElement('select');
       for (const mat in materiales) {
@@ -104,27 +114,33 @@
       }
       tdMaterial.appendChild(select);
 
+      // Largo
       const tdLargo = document.createElement('td');
       const inputLargo = document.createElement('input');
       inputLargo.type = 'number';
       inputLargo.step = '0.01';
       tdLargo.appendChild(inputLargo);
 
+      // Alto
       const tdAlto = document.createElement('td');
       const inputAlto = document.createElement('input');
       inputAlto.type = 'number';
       inputAlto.step = '0.01';
       tdAlto.appendChild(inputAlto);
 
+      // m²
       const tdM2 = document.createElement('td');
       tdM2.textContent = '0.00';
 
+      // Precio m²
       const tdPrecio = document.createElement('td');
       tdPrecio.textContent = `$${select.value}`;
 
+      // Total
       const tdTotal = document.createElement('td');
       tdTotal.textContent = '$0.00';
 
+      // Botón eliminar
       const tdEliminar = document.createElement('td');
       const btnEliminar = document.createElement('button');
       btnEliminar.textContent = '🗑️';
@@ -135,22 +151,25 @@
       tdEliminar.appendChild(btnEliminar);
 
       const actualizar = () => {
+        const cantidad = parseFloat(inputCantidad.value) || 0;
         const largo = parseFloat(inputLargo.value) || 0;
         const alto = parseFloat(inputAlto.value) || 0;
-        const m2 = largo * alto;
         const precio = parseFloat(select.value);
-        const total = m2 * precio;
+
+        const m2Total = cantidad * largo * alto;
+        const total = m2Total * precio;
         const totalRedondeado = redondearADecena(total);
 
-        tdM2.textContent = m2.toFixed(2);
+        tdM2.textContent = m2Total.toFixed(2);
         tdPrecio.textContent = `$${precio}`;
         tdTotal.textContent = `$${totalRedondeado.toFixed(2)}`;
 
         actualizarResumen();
       };
 
-      [select, inputLargo, inputAlto].forEach(el => el.oninput = actualizar);
+      [inputCantidad, select, inputLargo, inputAlto].forEach(el => el.oninput = actualizar);
 
+      fila.appendChild(tdCantidad);
       fila.appendChild(tdMaterial);
       fila.appendChild(tdLargo);
       fila.appendChild(tdAlto);
@@ -170,7 +189,7 @@
 
       filas.forEach(fila => {
         const matNombre = fila.querySelector('td select')?.selectedOptions[0]?.textContent;
-        const totalTxt = fila.querySelector('td:nth-child(6)')?.textContent || "$0";
+        const totalTxt = fila.querySelector('td:nth-child(7)')?.textContent || "$0";
         const totalNum = parseFloat(totalTxt.replace('$', '')) || 0;
 
         if (matNombre) {
