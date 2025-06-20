@@ -39,6 +39,10 @@
       padding: 10px 15px;
       margin-top: 10px;
     }
+    tfoot td {
+      font-weight: bold;
+      background-color: #f2f2f2;
+    }
   </style>
 </head>
 <body>
@@ -61,6 +65,13 @@
       <tbody id="tabla">
         <!-- Filas dinámicas -->
       </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="5">TOTAL GENERAL</td>
+          <td id="totalGeneral">$0.00</td>
+          <td></td>
+        </tr>
+      </tfoot>
     </table>
   </div>
 
@@ -123,10 +134,13 @@
       const tdEliminar = document.createElement('td');
       const btnEliminar = document.createElement('button');
       btnEliminar.textContent = '🗑️';
-      btnEliminar.onclick = () => fila.remove();
+      btnEliminar.onclick = () => {
+        fila.remove();
+        actualizarTotalGeneral();
+      };
       tdEliminar.appendChild(btnEliminar);
 
-      // Evento para actualizar los cálculos
+      // Actualizar fila
       const actualizar = () => {
         const largo = parseFloat(inputLargo.value) || 0;
         const alto = parseFloat(inputAlto.value) || 0;
@@ -137,11 +151,13 @@
         tdM2.textContent = m2.toFixed(2);
         tdPrecio.textContent = `$${precio}`;
         tdTotal.textContent = `$${total.toFixed(2)}`;
+
+        actualizarTotalGeneral();
       };
 
       [select, inputLargo, inputAlto].forEach(el => el.oninput = actualizar);
 
-      // Armar fila
+      // Agregar la fila
       fila.appendChild(tdMaterial);
       fila.appendChild(tdLargo);
       fila.appendChild(tdAlto);
@@ -149,11 +165,25 @@
       fila.appendChild(tdPrecio);
       fila.appendChild(tdTotal);
       fila.appendChild(tdEliminar);
-
       tabla.appendChild(fila);
+
+      actualizar(); // Para mostrar valores iniciales
     }
 
-    // Agrega una fila al inicio
+    function actualizarTotalGeneral() {
+      const filas = document.querySelectorAll('#tabla tr');
+      let total = 0;
+      filas.forEach(fila => {
+        const td = fila.querySelector('td:nth-child(6)');
+        if (td && td.textContent.includes('$')) {
+          const valor = parseFloat(td.textContent.replace('$', '')) || 0;
+          total += valor;
+        }
+      });
+      document.getElementById('totalGeneral').textContent = `$${total.toFixed(2)}`;
+    }
+
+    // Carga una fila inicial
     agregarFila();
   </script>
 </body>
