@@ -3,56 +3,163 @@
 <head>
   <meta charset="UTF-8">
   <title>Calculadora de Precios</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body { font-family: Arial, sans-serif; max-width: 400px; margin: auto; padding: 20px; }
-    select, input, button { width: 100%; padding: 10px; margin: 10px 0; }
-    h2 { text-align: center; }
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 1000px;
+      margin: auto;
+    }
+    h2 {
+      text-align: center;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    table, th, td {
+      border: 1px solid #ccc;
+    }
+    th, td {
+      padding: 8px;
+      text-align: center;
+    }
+    select, input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 6px;
+    }
+    button {
+      padding: 10px 15px;
+      margin-top: 10px;
+    }
+    @media (max-width: 600px) {
+      table, thead, tbody, th, td, tr {
+        display: block;
+      }
+      tr {
+        margin-bottom: 15px;
+      }
+      td {
+        border: none;
+        border-bottom: 1px solid #ccc;
+      }
+    }
   </style>
 </head>
 <body>
-  <h2>Calculadora de Vidrios y Acrílicos</h2>
-
-  <label for="material">Selecciona el material:</label>
-  <select id="material">
-    <option value="500">Plástico ($500)</option>
-    <option value="850">Acrílico 3mm ($850)</option>
-    <option value="1700">Acrílico 6mm ($1700)</option>
-    <option value="320">Vidrio claro 3mm ($320)</option>
-    <option value="420">Vidrio claro 4mm ($420)</option>
-    <option value="550">Vidrio claro 6mm ($550)</option>
-    <option value="750">Vidrio esmerilado 6mm ($750)</option>
-    <option value="650">Filtrasol 6mm ($650)</option>
-    <option value="1100">Espejo 6mm ($1100)</option>
-    <option value="1600">Reflecta 6mm ($1600)</option>
-  </select>
-
-  <label for="largo">Largo (metros):</label>
-  <input type="number" id="largo" step="0.01" placeholder="Ej: 1.20">
-
-  <label for="alto">Alto (metros):</label>
-  <input type="number" id="alto" step="0.01" placeholder="Ej: 0.80">
-
-  <button onclick="calcular()">Calcular Precio</button>
-
-  <h3 id="resultado"></h3>
+  <h2>Calculadora de Precios por Piezas</h2>
+  <button onclick="agregarFila()">➕ Agregar pieza</button>
+  <table>
+    <thead>
+      <tr>
+        <th>Material</th>
+        <th>Largo (m)</th>
+        <th>Alto (m)</th>
+        <th>m²</th>
+        <th>Precio m²</th>
+        <th>Total</th>
+        <th>🗑</th>
+      </tr>
+    </thead>
+    <tbody id="tabla">
+      <!-- Aquí van las filas -->
+    </tbody>
+  </table>
 
   <script>
-    function calcular() {
-      const precioM2 = parseFloat(document.getElementById('material').value);
-      const largo = parseFloat(document.getElementById('largo').value);
-      const alto = parseFloat(document.getElementById('alto').value);
+    const materiales = {
+      "Plástico": 500,
+      "Acrílico 3mm": 850,
+      "Acrílico 6mm": 1700,
+      "Vidrio claro 3mm": 320,
+      "Vidrio claro 4mm": 420,
+      "Vidrio claro 6mm": 550,
+      "Vidrio esmerilado 6mm": 750,
+      "Filtrasol 6mm": 650,
+      "Espejo 6mm": 1100,
+      "Reflecta 6mm": 1600
+    };
 
-      if (isNaN(precioM2) || isNaN(largo) || isNaN(alto)) {
-        document.getElementById('resultado').innerText = "Por favor, llena todos los campos correctamente.";
-        return;
+    function agregarFila() {
+      const tabla = document.getElementById('tabla');
+      const fila = document.createElement('tr');
+
+      // Material
+      const tdMaterial = document.createElement('td');
+      const select = document.createElement('select');
+      for (const mat in materiales) {
+        const option = document.createElement('option');
+        option.value = materiales[mat];
+        option.textContent = mat;
+        select.appendChild(option);
       }
+      tdMaterial.appendChild(select);
 
-      const metrosCuadrados = largo * alto;
-      const precioTotal = metrosCuadrados * precioM2;
+      // Largo
+      const tdLargo = document.createElement('td');
+      const inputLargo = document.createElement('input');
+      inputLargo.type = 'number';
+      inputLargo.step = '0.01';
+      tdLargo.appendChild(inputLargo);
 
-      document.getElementById('resultado').innerText =
-        `Total: $${precioTotal.toFixed(2)} MXN (${metrosCuadrados.toFixed(2)} m²)`;
+      // Alto
+      const tdAlto = document.createElement('td');
+      const inputAlto = document.createElement('input');
+      inputAlto.type = 'number';
+      inputAlto.step = '0.01';
+      tdAlto.appendChild(inputAlto);
+
+      // m²
+      const tdM2 = document.createElement('td');
+      tdM2.textContent = '0.00';
+
+      // Precio m²
+      const tdPrecio = document.createElement('td');
+      tdPrecio.textContent = select.value;
+
+      // Total
+      const tdTotal = document.createElement('td');
+      tdTotal.textContent = '0.00';
+
+      // Botón eliminar
+      const tdEliminar = document.createElement('td');
+      const btnEliminar = document.createElement('button');
+      btnEliminar.textContent = '🗑️';
+      btnEliminar.onclick = () => fila.remove();
+      tdEliminar.appendChild(btnEliminar);
+
+      // Agregar listeners
+      [select, inputLargo, inputAlto].forEach(el => {
+        el.oninput = () => {
+          const largo = parseFloat(inputLargo.value) || 0;
+          const alto = parseFloat(inputAlto.value) || 0;
+          const m2 = largo * alto;
+          const precio = parseFloat(select.value);
+          const total = m2 * precio;
+
+          tdM2.textContent = m2.toFixed(2);
+          tdPrecio.textContent = `$${precio}`;
+          tdTotal.textContent = `$${total.toFixed(2)}`;
+        };
+      });
+
+      // Agregar a la fila
+      fila.appendChild(tdMaterial);
+      fila.appendChild(tdLargo);
+      fila.appendChild(tdAlto);
+      fila.appendChild(tdM2);
+      fila.appendChild(tdPrecio);
+      fila.appendChild(tdTotal);
+      fila.appendChild(tdEliminar);
+
+      tabla.appendChild(fila);
     }
+
+    // Agrega una fila inicial
+    agregarFila();
   </script>
 </body>
 </html>
