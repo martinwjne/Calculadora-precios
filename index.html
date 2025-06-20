@@ -1,1 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Calculadora de Precios</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 400px; margin: auto; padding: 20px; }
+    select, input, button { width: 100%; padding: 10px; margin: 10px 0; }
+    h2 { text-align: center; }
+  </style>
+</head>
+<body>
+  <h2>Calculadora de Vidrios y Acrílicos</h2>
 
+  <label for="material">Selecciona el material:</label>
+  <select id="material">
+    <option value="500">Plástico ($500)</option>
+    <option value="850">Acrílico 3mm ($850)</option>
+    <option value="1700">Acrílico 6mm ($1700)</option>
+    <option value="320">Vidrio claro 3mm ($320)</option>
+    <option value="420">Vidrio claro 4mm ($420)</option>
+    <option value="550">Vidrio claro 6mm ($550)</option>
+    <option value="750">Vidrio esmerilado 6mm ($750)</option>
+    <option value="650">Filtrasol 6mm ($650)</option>
+    <option value="1100">Espejo 6mm ($1100)</option>
+    <option value="1600">Reflecta 6mm ($1600)</option>
+  </select>
+
+  <label for="largo">Largo (metros):</label>
+  <input type="number" id="largo" step="0.01" placeholder="Ej: 1.20">
+
+  <label for="alto">Alto (metros):</label>
+  <input type="number" id="alto" step="0.01" placeholder="Ej: 0.80">
+
+  <button onclick="calcular()">Calcular Precio</button>
+
+  <h3 id="resultado"></h3>
+
+  <script>
+    function calcular() {
+      const precioM2 = parseFloat(document.getElementById('material').value);
+      const largo = parseFloat(document.getElementById('largo').value);
+      const alto = parseFloat(document.getElementById('alto').value);
+
+      if (isNaN(precioM2) || isNaN(largo) || isNaN(alto)) {
+        document.getElementById('resultado').innerText = "Por favor, llena todos los campos correctamente.";
+        return;
+      }
+
+      const metrosCuadrados = largo * alto;
+      const precioTotal = metrosCuadrados * precioM2;
+
+      document.getElementById('resultado').innerText =
+        `Total: $${precioTotal.toFixed(2)} MXN (${metrosCuadrados.toFixed(2)} m²)`;
+    }
+  </script>
+</body>
+</html>
